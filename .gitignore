@@ -1,0 +1,17 @@
+# Claude Code
+.claude/
+
+# ModelSim
+work/
+*.wlf
+*.mpf
+*.cr.mti
+*.mti
+transcript
+modelsim.ini
+vsim.wlf
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
