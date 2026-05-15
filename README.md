@@ -1,105 +1,106 @@
-# 🔢 GCD Calculator — Verilog HDL
+# 🔢 GCD 最大公约数计算器 — Verilog HDL 实现
 
-> 🧮 8-bit Greatest Common Divisor (GCD) calculator using the Euclidean subtraction algorithm, implemented in Verilog and verified with ModelSim.
+> 🧮 基于欧几里得减法算法的 8 位最大公约数（GCD）硬件计算器，使用 Verilog 实现，ModelSim 仿真验证。
 
 ---
 
-## 📖 Overview
+## 📖 项目简介
 
-This project implements a **hardware GCD calculator** that computes the Greatest Common Divisor of two 8-bit unsigned integers. The design follows the classic **FSM + Datapath** architecture pattern, using repeated subtraction (Euclidean algorithm) to find the result.
+本项目实现了一个**硬件 GCD 计算器**，能够计算两个 8 位无符号整数的最大公约数。设计采用经典的 **FSM 控制器 + 数据通路** 架构，通过反复减法（欧几里得算法）求得结果。
 
-## ✨ Features
+## ✨ 主要特性
 
-- 🧠 **FSM-based Controller** — 13-state finite state machine for sequencing operations
-- 🔧 **Modular Datapath** — clean separation of registers, subtractors, comparators, and muxes
-- 🔢 **8-bit Arithmetic** — supports unsigned 8-bit input operands
-- ✅ **Testbench Included** — ready-to-simulate testbench with ModelSim
-- 🎯 **Synchronous Reset** — predictable startup behavior
-- ⏱️ **50 MHz Clock** — 20ns clock period in simulation
+- 🧠 **FSM 控制器** — 13 状态有限状态机，负责运算流程调度
+- 🔧 **模块化数据通路** — 寄存器、减法器、比较器、选择器清晰分离
+- 🔢 **8 位运算** — 支持 8 位无符号整数输入
+- ✅ **包含测试平台** — 可直接在 ModelSim 中仿真验证
+- 🎯 **同步复位** — 可预测的启动行为
+- ⏱️ **50 MHz 时钟** — 仿真中使用 20ns 时钟周期
 
-## 🏗️ Architecture
+## 🏗️ 系统架构
 
 ```
 ┌─────────────────────────────────────────────┐
-│                  GCD (Top)                  │
+│               GCD (顶层模块)                 │
 │                                             │
 │  ┌─────────────┐       ┌─────────────────┐  │
 │  │  Controller  │◄─────►│    DataPath     │  │
-│  │  (FSM 13S)  │       │                 │  │
-│  │             │       │  ┌───────────┐  │  │
-│  │  go_i ──►   │       │  │  DataReg  │  │  │
-│  │  reset ──►  │       │  │  (x, y)   │  │  │
-│  │  clk ──►    │       │  ├───────────┤  │  │
-│  │             │       │  │ 8-bit Sub │  │  │
-│  │  done_o ◄── │       │  │ (x-y,y-x)│  │  │
-│  └─────────────┘       │  ├───────────┤  │  │
-│                        │  │ Comparator│  │  │
+│  │  (FSM 13态)  │       │    (数据通路)    │  │
+│  │             │       │                 │  │
+│  │  go_i ──►   │       │  ┌───────────┐  │  │
+│  │  reset ──►  │       │  │  DataReg  │  │  │
+│  │  clk ──►    │       │  │  (x, y)   │  │  │
+│  │             │       │  ├───────────┤  │  │
+│  │  done_o ◄── │       │  │ 8位减法器  │  │  │
+│  └─────────────┘       │  │ (x-y,y-x)│  │  │
+│                        │  ├───────────┤  │  │
+│                        │  │  比较器    │  │  │
 │                        │  │ (<, ≠)    │  │  │
 │                        │  └───────────┘  │  │
 │                        └─────────────────┘  │
 └─────────────────────────────────────────────┘
 ```
 
-## 📁 File Structure
+## 📁 文件结构
 
-| File | Description |
-|------|-------------|
-| `GCD.v` | 🏠 Top-level module connecting Controller and DataPath |
-| `Controller.v` | 🎛️ FSM controller with 13 states (idle, load, compare, subtract, done) |
-| `DataPath.v` | 🔩 Datapath with registers, subtractors, comparators, and muxes |
-| `DataReg.v` | 📦 8-bit data register with load enable |
-| `eightBitAdder.v` | ➕ 8-bit ripple-carry adder (built from full adders) |
-| `eightBitSubtracter.v` | ➖ 8-bit subtracter using 2's complement |
-| `fulladder.v` | 🔹 1-bit full adder (gate-level) |
-| `mux2.v` | 🔀 2-to-1 multiplexer |
-| `lessThan.v` | 📐 8-bit less-than comparator |
-| `notEqual.v` | 📐 8-bit not-equal comparator |
-| `GCD_tb.v` | 🧪 Testbench — tests GCD(6,9)=3 and GCD(12,8)=4 |
+| 文件 | 说明 |
+|------|------|
+| `GCD.v` | 🏠 顶层模块，连接控制器和数据通路 |
+| `Controller.v` | 🎛️ FSM 控制器，13 个状态（空闲、加载、比较、减法、完成） |
+| `DataPath.v` | 🔩 数据通路，包含寄存器、减法器、比较器和选择器 |
+| `DataReg.v` | 📦 8 位数据寄存器，带加载使能 |
+| `eightBitAdder.v` | ➕ 8 位行波进位加法器（由全加器级联构成） |
+| `eightBitSubtracter.v` | ➖ 8 位减法器（基于二进制补码实现） |
+| `fulladder.v` | 🔹 1 位全加器（门级实现） |
+| `mux2.v` | 🔀 2 选 1 多路选择器 |
+| `lessThan.v` | 📐 8 位小于比较器 |
+| `notEqual.v` | 📐 8 位不等比较器 |
+| `GCD_tb.v` | 🧪 测试平台 — 测试 GCD(6,9)=3 和 GCD(12,8)=4 |
 
-## 🚀 How to Run (ModelSim)
+## 🚀 使用方法（ModelSim）
 
-1. 📂 Open ModelSim and navigate to the project directory
-2. 📋 Compile all source files:
+1. 📂 打开 ModelSim，进入项目目录
+2. 📋 编译所有源文件：
    ```tcl
    vlog *.v
    ```
-3. ▶️ Run the simulation:
+3. ▶️ 运行仿真：
    ```tcl
    vsim work.GCD_tb
    run 1000ns
    ```
-4. 📊 Add signals to wave viewer to observe results
+4. 📊 将信号添加到波形窗口观察结果
 
-## 🧪 Test Cases
+## 🧪 测试用例
 
-| Test | x | y | Expected GCD |
-|------|---|---|-------------|
+| 测试 | x | y | 预期 GCD |
+|------|---|---|---------|
 | 1️⃣ | 6 | 9 | **3** |
 | 2️⃣ | 12 | 8 | **4** |
 
-## ⚙️ Algorithm
+## ⚙️ 算法说明
 
-The GCD is computed using the **Euclidean subtraction algorithm**:
+GCD 使用**欧几里得减法算法**计算：
 
 ```
-while (x ≠ y):
-    if (x < y):
+当 x ≠ y 时：
+    如果 x < y：
         y = y - x
-    else:
+    否则：
         x = x - y
 GCD = x
 ```
 
-## 🛠️ Tools Used
+## 🛠️ 使用工具
 
-- 🔧 **Verilog HDL** — Hardware description language
-- 🔬 **ModelSim** — Simulation and verification
-- 📐 **FSM Design** — Mealy/Moore hybrid state machine
+- 🔧 **Verilog HDL** — 硬件描述语言
+- 🔬 **ModelSim** — 仿真与验证工具
+- 📐 **FSM 设计** — Mealy/Moore 混合状态机
 
-## 📜 License
+## 📜 许可证
 
-This project is for educational purposes. 📚
+本项目仅供学习交流使用。📚
 
 ---
 
-⭐ If you found this project helpful, please give it a star!
+⭐ 如果觉得这个项目有帮助，请点个 Star 支持一下！
